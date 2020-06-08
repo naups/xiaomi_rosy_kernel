@@ -91,6 +91,23 @@ VDSO_CFLAGS += -D__uint128_t='void*'
 VDSO_CFLAGS += $(call cc32-disable-warning,shift-count-overflow)
 VDSO_CFLAGS += -Wno-int-to-pointer-cast
 
+# Compile as THUMB2 or ARM. Unwinding via frame-pointers in THUMB2 is
+# unreliable.
+ifeq ($(CONFIG_THUMB2_COMPAT_VDSO), y)
+VDSO_CFLAGS += -mthumb -fomit-frame-pointer
+else
+VDSO_CFLAGS += -marm
+endif
+
+ifeq ($(cc-name),clang)
+# Snapdragon LLVM specific warning
+VDSO_CFLAGS += $(call cc32-disable-warning, vectorizer-no-neon)
+endif
+
+ifdef CONFIG_MACH_XIAOMI_MSM8953
+VDSO_CFLAGS += -mcpu=cortex-a53 -Wa,-mcpu=cortex-a53 -mtune=cortex-a53
+endif
+
 VDSO_AFLAGS := $(VDSO_CAFLAGS)
 VDSO_AFLAGS += -D__ASSEMBLY__
 
