@@ -128,3 +128,6 @@ Android.bp
 # Lineaged ignorance
 #
 !.github
+
+# Object directory
+out/
