@@ -98,7 +98,8 @@ VDSO_LDFLAGS += -nostdlib -shared -mfloat-abi=soft
 VDSO_LDFLAGS += $(call cc32-ldoption,-Wl$(comma)--hash-style=sysv)
 VDSO_LDFLAGS += $(call cc32-ldoption,-Wl$(comma)--build-id)
 VDSO_LDFLAGS += $(call cc32-ldoption,-fuse-ld=bfd)
-
+VDSO_LDFLAGS += -z noexecstack
+VDSO_LDFLAGS += $(call cc32-ld-option,--no-warn-rwx-segments)
 
 # Borrow vdsomunge.c from the arm vDSO
 # We have to use a relative path because scripts/Makefile.host prefixes
