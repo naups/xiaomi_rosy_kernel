@@ -292,7 +292,7 @@ static int dsi_host_regulator_enable(struct msm_dsi_host *msm_host)
 			if (ret < 0) {
 				pr_err("regulator %d set op mode failed, %d\n",
 					i, ret);
-				goto fail;
+				return ret;
 			}
 		}
 	}
@@ -300,7 +300,7 @@ static int dsi_host_regulator_enable(struct msm_dsi_host *msm_host)
 	ret = regulator_bulk_enable(num, s);
 	if (ret < 0) {
 		pr_err("regulator enable failed, %d\n", ret);
-		goto fail;
+		return ret;
 	}
 
 	return 0;
@@ -1700,7 +1700,7 @@ int msm_dsi_host_init(struct msm_dsi *msm_dsi)
 		pr_err("%s: FAILED: cannot alloc dsi host\n",
 		       __func__);
 		ret = -ENOMEM;
-		goto fail;
+		return ret;
 	}
 
 	msm_host->pdev = pdev;
@@ -1708,28 +1708,28 @@ int msm_dsi_host_init(struct msm_dsi *msm_dsi)
 	ret = dsi_host_parse_dt(msm_host);
 	if (ret) {
 		pr_err("%s: failed to parse dt\n", __func__);
-		goto fail;
+		return ret;
 	}
 
 	msm_host->ctrl_base = msm_ioremap(pdev, "dsi_ctrl", "DSI CTRL");
 	if (IS_ERR(msm_host->ctrl_base)) {
 		pr_err("%s: unable to map Dsi ctrl base\n", __func__);
 		ret = PTR_ERR(msm_host->ctrl_base);
-		goto fail;
+		return ret;
 	}
 
 	msm_host->cfg_hnd = dsi_get_config(msm_host);
 	if (!msm_host->cfg_hnd) {
 		ret = -EINVAL;
 		pr_err("%s: get config failed\n", __func__);
-		goto fail;
+		return ret;
 	}
 
 	msm_host->id = dsi_host_get_id(msm_host);
 	if (msm_host->id < 0) {
 		ret = msm_host->id;
 		pr_err("%s: unable to identify DSI host index\n", __func__);
-		goto fail;
+		return ret;
 	}
 
 	/* fixup base address by io offset */
@@ -1738,19 +1738,19 @@ int msm_dsi_host_init(struct msm_dsi *msm_dsi)
 	ret = dsi_regulator_init(msm_host);
 	if (ret) {
 		pr_err("%s: regulator init failed\n", __func__);
-		goto fail;
+		return ret;
 	}
 
 	ret = dsi_clk_init(msm_host);
 	if (ret) {
 		pr_err("%s: unable to initialize dsi clks\n", __func__);
-		goto fail;
+		return ret;
 	}
 
 	msm_host->rx_buf = devm_kzalloc(&pdev->dev, SZ_4K, GFP_KERNEL);
 	if (!msm_host->rx_buf) {
 		pr_err("%s: alloc rx temp buf failed\n", __func__);
-		goto fail;
+		return ret;
 	}
 
 	init_completion(&msm_host->dma_comp);
@@ -1773,9 +1773,6 @@ int msm_dsi_host_init(struct msm_dsi *msm_dsi)
 
 	DBG("Dsi Host %d initialized", msm_host->id);
 	return 0;
-
-fail:
-	return ret;
 }
 
 void msm_dsi_host_destroy(struct mipi_dsi_host *host)
