@@ -31,7 +31,7 @@ jobs:
           defconfig: rosy-perf_defconfig
           image: Image.gz-dtb
 
-      - name: Release build
+      - name: Release build (Telegram)
         if: ${{ success() }}
         uses: appleboy/telegram-action@master
         with:
@@ -40,7 +40,7 @@ jobs:
           message: Kernel Lineaged telah dibuat pada repo ${{ github.repository }} dengan commits berikut ${{ github.sha }}, untuk informasi lebih bisa membuka github repository naups
           document: ${{ steps.build.outputs.outfile }}
 
-      - name: Release build (if successful)
+      - name: Release build (Github)
         if: ${{ success() }}
         uses: ncipollo/release-action@v1
         with:
