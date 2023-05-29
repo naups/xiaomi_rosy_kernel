@@ -1,0 +1,48 @@
+name: Build Redmi 5 lineage kernel
+
+on:
+  push:
+    branches:
+      - 'lineage-20.0'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout kernel source
+        uses: actions/checkout@v2
+
+      - name: Checkout zipper
+        uses: actions/checkout@v2
+        with:
+          repository: SantriKode/AnyKranul3
+          path: zipper
+
+      - name: Android kernel build
+        uses: SantriKode/arm64-kernel-actions@master
+        id: build
+        env:
+          NAME: Lineaged_kernel
+        with:
+          arch: arm64
+          compiler: neutron-clang/master
+          defconfig: rosy-perf_defconfig
+          image: Image.gz-dtb
+
+      - name: Release build
+        if: ${{ success() }}
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.CHANNEL_ID }}
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          message: Kernel Lineaged telah dibuat pada repo ${{ github.repository }} dengan commits berikut ${{ github.sha }}, untuk informasi lebih bisa membuka github repository naups
+          document: ${{ steps.build.outputs.outfile }}
+
+      - name: Release build (if successful)
+        if: ${{ success() }}
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: ${{ steps.build.outputs.outfile }}
+          token: ${{ secrets.SECRET_TOKEN }}
