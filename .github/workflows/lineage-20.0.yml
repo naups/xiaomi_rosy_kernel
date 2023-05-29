@@ -39,10 +39,3 @@ jobs:
           token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           message: Kernel Lineaged telah dibuat pada repo ${{ github.repository }} dengan commits berikut ${{ github.sha }}, untuk informasi lebih bisa membuka github repository naups
           document: ${{ steps.build.outputs.outfile }}
-
-      - name: Release build (Github)
-        if: ${{ success() }}
-        uses: ncipollo/release-action@v1
-        with:
-          artifacts: ${{ steps.build.outputs.outfile }}
-          token: ${{ secrets.SECRET_TOKEN }}
