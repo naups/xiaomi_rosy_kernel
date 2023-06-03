@@ -1451,7 +1451,7 @@ static int afe_get_cal_topology_id(u16 port_id, u32 *topology_id,
 	struct audio_cal_info_afe_top   *afe_top_info = NULL;
 
 	if (this_afe.cal_data[cal_type_index] == NULL) {
-		pr_err("%s: cal_type %d not initialized\n", __func__,
+		pr_debug("%s: cal_type %d not initialized\n", __func__,
 			cal_type_index);
 		return -EINVAL;
 	}
@@ -1619,7 +1619,7 @@ static struct cal_block_data *afe_find_cal(int cal_index, int port_id)
 			goto exit;
 		}
 	}
-	pr_err("%s: no matching cal_block found\n", __func__);
+	pr_debug("%s: no matching cal_block found\n", __func__);
 	cal_block = NULL;
 
 exit:
@@ -1660,7 +1660,7 @@ static int send_afe_cal_type(int cal_index, int port_id)
 				this_afe.cal_data[cal_index]);
 
 	if (cal_block == NULL || cal_utils_is_cal_stale(cal_block)) {
-		pr_err("%s cal_block not found!!\n", __func__);
+		pr_debug("%s cal_block not found!!\n", __func__);
 		ret = -EINVAL;
 		goto unlock;
 	}
