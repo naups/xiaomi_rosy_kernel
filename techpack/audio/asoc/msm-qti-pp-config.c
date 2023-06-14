@@ -874,14 +874,15 @@ int msm_adsp_init_mixer_ctl_pp_event_queue(struct snd_soc_pcm_runtime *rtd)
 	if (kctl->private_data != NULL) {
 		pr_err("%s: kctl_prtd is not NULL at initialization.\n",
 			__func__);
-		return -EINVAL;
+		ret = -EINVAL;
+		goto cleanup;
 	}
 
 	kctl_prtd = kzalloc(sizeof(struct dsp_stream_callback_prtd),
 			GFP_KERNEL);
 	if (!kctl_prtd) {
 		ret = -ENOMEM;
-		goto done;
+		goto cleanup;
 	}
 
 	spin_lock_init(&kctl_prtd->prtd_spin_lock);
@@ -889,8 +890,16 @@ int msm_adsp_init_mixer_ctl_pp_event_queue(struct snd_soc_pcm_runtime *rtd)
 	kctl_prtd->event_count = 0;
 	kctl->private_data = kctl_prtd;
 
+	goto done;
+
+cleanup:
+    if (kctl_prtd) {
+        kfree(kctl_prtd);
+    }
+    return ret;
+
 done:
-	return ret;
+    return ret;
 }
 
 int msm_adsp_clean_mixer_ctl_pp_event_queue(struct snd_soc_pcm_runtime *rtd)
