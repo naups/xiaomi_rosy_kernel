@@ -10974,7 +10974,7 @@ int q6asm_send_cal(struct audio_client *ac)
 
 	if (cal_utils_is_cal_stale(cal_block)) {
 		rc = 0; /* not error case */
-		pr_err("%s: cal_block is stale\n",
+		pr_debug("%s: cal_block is stale\n",
 			__func__);
 		goto unlock;
 	}
