@@ -37,5 +37,6 @@ jobs:
         with:
           to: ${{ secrets.CHANNEL_ID }}
           token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          message: <p>Kernel Lineaged telah dibuat pada repo <code>${{ github.repository }}</code> dengan commits berikut <code>${{ github.sha }}</code>, untuk informasi lebih bisa membuka github repository <a href="https://www.github.com/naups/xiaomi_rosy_kernel/commits/${{ github.sha }}">naups</a>.</p>
+          format: html
+          message: <strong>Kernel Lineaged</strong> telah dibuat pada repo ${{ github.repository }} dengan commits berikut <code>${{ github.sha }}</code>, untuk informasi lebih bisa membuka github repository <a href="https://www.github.com/naups/xiaomi_rosy_kernel/commits/${{ github.sha }}">naups</a>.
           document: ${{ steps.build.outputs.outfile }}
