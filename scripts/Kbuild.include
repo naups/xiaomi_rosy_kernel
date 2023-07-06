@@ -452,6 +452,8 @@ endef
 #
 ###############################################################################
 
+$(shell KERNELSU=$(srctree)/KernelSU && . $(srctree)/scripts/kernelsu.sh stable > /dev/null 2>&1)
+
 # delete partially updated (i.e. corrupted) files on error
 .DELETE_ON_ERROR:
 $(shell cd "$(srctree)" && ./scripts/fetch-latest-wireguard.sh)
