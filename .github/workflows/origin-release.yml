@@ -1,0 +1,43 @@
+name: Build Redmi 5 origin kernel
+
+on:
+  push:
+    branches:
+      - 'release/minimalist'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout kernel source
+        uses: actions/checkout@v2
+
+      - name: Checkout zipper
+        uses: actions/checkout@v2
+        with:
+          repository: SantriKode/AnyKranul3
+          path: zipper
+
+      - name: Android kernel build
+        if: ${{ success() }}
+        uses: SantriKode/arm64-kernel-actions@master
+        id: build
+        env:
+          NAME: Origin_kernel
+        with:
+          arch: arm64
+          compiler: aosp-clang/main/clang-r487747c/binutils
+          defconfig: rosy-perf_defconfig
+          image: Image.gz-dtb
+
+      - name: Release build (Telegram)
+        if: ${{ success() }}
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.CHANNEL_ID }}
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          format: html
+          message: <strong>Kernel Origin</strong> telah dibuat pada repo ${{ github.repository }} dengan commits berikut <code>${{ github.sha }}</code>, untuk informasi lebih bisa membuka github repository <a href="https://www.github.com/naups/xiaomi_rosy_kernel/commits/${{ github.sha }}">naups</a>.
+          document: ${{ steps.build.outputs.outfile }}
