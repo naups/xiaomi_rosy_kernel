@@ -1,4 +1,4 @@
-name: Build Redmi 5 origin kernel
+name: Build Redmi 5 Lineaged kernel
 
 on:
   push:
@@ -25,10 +25,10 @@ jobs:
         uses: SantriKode/arm64-kernel-actions@master
         id: build
         env:
-          NAME: Origin_kernel
+          NAME: Lineaged_kernel
         with:
           arch: arm64
-          compiler: aosp-clang/main/clang-r487747c/binutils
+          compiler: aosp-clang/main/clang-r498229/binutils
           defconfig: rosy-perf_defconfig
           image: Image.gz-dtb
 
