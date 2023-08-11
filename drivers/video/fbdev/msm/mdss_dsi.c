@@ -3070,7 +3070,7 @@ static struct device_node *mdss_dsi_find_panel_of_node(
 end:
 	if (strcmp(panel_name, NONE_PANEL))
 		dsi_pan_node = mdss_dsi_pref_prim_panel(pdev);
-		is_Lcm_Present = false;
+	is_Lcm_Present = false;
 exit:
 	return dsi_pan_node;
 }
