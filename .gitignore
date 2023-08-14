@@ -126,6 +126,3 @@ Android.bp
 
 # Object directory
 out/
-
-# KSU
-KernelSU/
