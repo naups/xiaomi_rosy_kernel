@@ -1,9 +1,9 @@
-name: Build Redmi 5 Lineaged kernel
+name: Build Redmi 5 Lineaged GpuBoost kernel
 
 on:
   push:
     branches:
-      - 'release/minimalist'
+      - 'release/boost-gpu'
 
 jobs:
   build:
@@ -25,7 +25,7 @@ jobs:
         uses: SantriKode/arm64-kernel-actions@master
         id: build
         env:
-          NAME: Lineaged_kernel
+          NAME: Lineaged_GpuBoost_kernel
         with:
           arch: arm64
           compiler: aosp-clang/main/clang-r498229/binutils
@@ -39,5 +39,5 @@ jobs:
           to: ${{ secrets.CHANNEL_ID }}
           token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           format: html
-          message: <strong>Kernel Lineaged</strong> telah dibuat pada repo ${{ github.repository }} dengan <strong>Compiler AOSP Google</strong> pada commits berikut <code>${{ github.sha }}</code>, untuk informasi lebih bisa membuka github repository <a href="https://www.github.com/naups/xiaomi_rosy_kernel/commits/${{ github.sha }}">naups</a>.
+          message: <strong>Kernel Lineaged GpuBoost</strong> telah dibuat pada repo ${{ github.repository }} dengan <strong>Compiler AOSP Google</strong> pada commits berikut <code>${{ github.sha }}</code>, untuk informasi lebih bisa membuka github repository <a href="https://www.github.com/naups/xiaomi_rosy_kernel/commits/${{ github.sha }}">naups</a>.
           document: ${{ steps.build.outputs.outfile }}
