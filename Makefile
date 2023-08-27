@@ -561,6 +561,10 @@ CLANG_FLAGS	+= $(call cc-option, -Wno-misleading-indentation)
 CLANG_FLAGS	+= $(call cc-option, -Wno-bool-operation)
 KBUILD_CFLAGS	+= $(CLANG_FLAGS)
 KBUILD_AFLAGS	+= $(CLANG_FLAGS)
+ifeq ($(ld-name),lld)
+KBUILD_CFLAGS	+= -fuse-ld=lld
+endif
+KBUILD_CPPFLAGS += -Qunused-arguments
 endif
 
 ifeq ($(mixed-targets),1)
@@ -683,10 +687,14 @@ export CFLAGS_GCOV CFLAGS_KCOV
 # Make toolchain changes before including arch/$(SRCARCH)/Makefile to ensure
 # ar/cc/ld-* macros return correct values.
 ifdef CONFIG_LTO_CLANG
-# use GNU gold with LLVMgold for LTO linking, and LD for vmlinux_link
+# use GNU gold with LLVMgold or LLD for LTO linking, and LD for vmlinux_link
+ifneq ($(ld-name),lld)
 LDFINAL_vmlinux := $(LD)
-LD		:= $(LDGOLD)
+LD		:= $(CROSS_COMPILE)ld.gold
 LDFLAGS		+= -plugin LLVMgold.so
+LDFLAGS		+= -plugin-opt=-function-sections
+LDFLAGS		+= -plugin-opt=-data-sections
+endif
 # use llvm-ar for building symbol tables from IR files, and llvm-dis instead
 # of objdump for processing symbol versions and exports
 LLVM_AR		:= llvm-ar
@@ -722,6 +730,11 @@ lto-clang-flags	:= -flto -fvisibility=hidden
 # allow disabling only clang LTO where needed
 DISABLE_LTO_CLANG := -fno-lto -fvisibility=default
 export DISABLE_LTO_CLANG
+
+# Set O3 optimization level for LTO
+KBUILD_LDFLAGS	+= --plugin-opt=O3 --strip-debug
+else
+KBUILD_LDFLAGS	+= -O3 --strip-debug
 endif
 
 ifdef CONFIG_LTO
@@ -763,10 +776,38 @@ DISABLE_LTO	+= $(DISABLE_CFI)
 export DISABLE_CFI
 endif
 
+ifdef CONFIG_LLVM_POLLY
+OPT_FLAGS	:= -mllvm -polly \
+		   -mllvm -polly-run-dce \
+		   -mllvm -polly-run-inliner \
+		   -mllvm -polly-ast-use-context \
+		   -mllvm -polly-detect-keep-going \
+		   -mllvm -polly-vectorizer=stripmine \
+		   -mllvm -polly-invariant-load-hoisting
+ifeq ($(call clang-ifversion, -ge, 1400, y), y)
+OPT_FLAGS       += -mllvm -polly-reschedule=1 \
+                   -mllvm -polly-loopfusion-greedy=1 \
+                   -mllvm -polly-postopts=1 \
+                   -mllvm -polly-num-threads=0 \
+                   -mllvm -polly-omp-backend=LLVM \
+                   -mllvm -polly-scheduling=dynamic \
+                   -mllvm -polly-scheduling-chunksize=1
+else
+OPT_FLAGS       += -mllvm -polly-opt-fusion=max
+endif
+KBUILD_CFLAGS += $(OPT_FLAGS)
+KBUILD_AFLAGS += $(OPT_FLAGS)
+KBUILD_LDFLAGS += $(OPT_FLAGS)
+endif
+
 ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
 KBUILD_CFLAGS   += -Os
 else
 KBUILD_CFLAGS   += -O3
+endif
+
+ifdef CONFIG_CC_WERROR
+KBUILD_CFLAGS	+= -Werror
 endif
 
 # Tell gcc to never replace conditional load with a non-conditional one
@@ -822,6 +863,12 @@ KBUILD_CPPFLAGS += $(call cc-option,-Qunused-arguments,)
 KBUILD_CFLAGS += $(call cc-disable-warning, format-invalid-specifier)
 KBUILD_CFLAGS += $(call cc-disable-warning, gnu)
 KBUILD_CFLAGS += $(call cc-disable-warning, duplicate-decl-specifier)
+KBUILD_CFLAGS += $(call cc-option, -Wno-undefined-optimized)
+KBUILD_CFLAGS += $(call cc-option, -Wno-tautological-constant-out-of-range-compare)
+KBUILD_CFLAGS += $(call cc-option, -Wno-sometimes-uninitialized)
+KBUILD_CFLAGS += -Wno-asm-operand-widths
+KBUILD_CFLAGS += -Wno-initializer-overrides
+KBUILD_CFLAGS += -fno-builtin
 # Quiet clang warning: comparison of unsigned expression < 0 is always false
 KBUILD_CFLAGS += $(call cc-disable-warning, tautological-compare)
 # CLANG uses a _MergedGlobals as optimization, but this breaks modpost, as the
@@ -849,7 +896,9 @@ KBUILD_CFLAGS	+= -fomit-frame-pointer
 endif
 endif
 
-KBUILD_CFLAGS   += $(call cc-option, -fno-var-tracking-assignments)
+# Workaround for GCC versions < 5.0
+# https://gcc.gnu.org/bugzilla/show_bug.cgi?id=61801
+KBUILD_CFLAGS   += $(call gcc-ifversion, -lt, 0500, $(call cc-option, -fno-var-tracking-assignments))
 
 ifdef CONFIG_DEBUG_INFO
 ifdef CONFIG_DEBUG_INFO_SPLIT
@@ -857,7 +906,9 @@ KBUILD_CFLAGS   += $(call cc-option, -gsplit-dwarf, -g)
 else
 KBUILD_CFLAGS	+= -g
 endif
+ifneq ($(LLVM_IAS),1)
 KBUILD_AFLAGS	+= -Wa,-gdwarf-2
+endif
 endif
 ifdef CONFIG_DEBUG_INFO_DWARF4
 KBUILD_CFLAGS	+= $(call cc-option, -gdwarf-4,)
@@ -940,6 +991,7 @@ KBUILD_CFLAGS  += $(call cc-option,-fno-stack-check,)
 # conserve stack if available
 KBUILD_CFLAGS   += $(call cc-option,-fconserve-stack)
 
+ifdef CONFIG_CC_WERROR
 # disallow errors like 'EXPORT_GPL(foo);' with missing header
 KBUILD_CFLAGS   += $(call cc-option,-Werror=implicit-int)
 
@@ -954,6 +1006,7 @@ KBUILD_CFLAGS   += $(call cc-option,-Werror=incompatible-pointer-types)
 
 # Require designated initializers for all marked structures
 KBUILD_CFLAGS   += $(call cc-option,-Werror=designated-init)
+endif
 
 # change __FILE__ to the relative path from the srctree
 KBUILD_CFLAGS	+= $(call cc-option,-fmacro-prefix-map=$(srctree)/=)
@@ -983,6 +1036,13 @@ endif
 
 ifeq ($(CONFIG_STRIP_ASM_SYMS),y)
 LDFLAGS_vmlinux	+= $(call ld-option, -X,)
+endif
+
+ifeq ($(CONFIG_RELR),y)
+LDFLAGS_vmlinux	+= --pack-dyn-relocs=relr
+OBJCOPY	:= llvm-objcopy
+NM	:= llvm-nm
+export OBJCOPY NM
 endif
 
 # Default kernel image to build when no specific target is given.
@@ -1144,7 +1204,7 @@ $(sort $(vmlinux-deps)): $(vmlinux-dirs) ;
 
 PHONY += $(vmlinux-dirs)
 $(vmlinux-dirs): prepare scripts
-	$(Q)$(MAKE) $(build)=$@
+	$(Q)$(MAKE) $(build)=$@ need-builtin=1
 
 define filechk_kernel.release
 	echo "$(KERNELVERSION)$$($(CONFIG_SHELL) $(srctree)/scripts/setlocalversion $(srctree))"
@@ -1224,8 +1284,10 @@ ifdef CONFIG_LTO_CLANG
   ifneq ($(call clang-ifversion, -ge, 0500, y), y)
 	@echo Cannot use CONFIG_LTO_CLANG: requires clang 5.0 or later >&2 && exit 1
   endif
-  ifneq ($(call gold-ifversion, -ge, 112000000, y), y)
-	@echo Cannot use CONFIG_LTO_CLANG: requires GNU gold 1.12 or later >&2 && exit 1
+  ifneq ($(ld-name), lld)
+    ifneq ($(call gold-ifversion, -ge, 112000000, y), y)
+	@echo Cannot use CONFIG_LTO_CLANG: requires LLD or GNU gold 1.12 or later >&2 && exit 1
+    endif
   endif
 endif
 # Make sure compiler supports LTO flags
@@ -1464,7 +1526,7 @@ CLEAN_DIRS  += $(MODVERDIR)
 # Directories & files removed with 'make mrproper'
 MRPROPER_DIRS  += include/config usr/include include/generated          \
 		  arch/*/include/generated .tmp_objdiff
-MRPROPER_FILES += .config .config.old .version .old_version \
+MRPROPER_FILES += .config .config.old .version \
 		  Module.symvers tags TAGS cscope* GPATH GTAGS GRTAGS GSYMS \
 		  signing_key.pem signing_key.priv signing_key.x509	\
 		  x509.genkey extra_certificates signing_key.x509.keyid	\
