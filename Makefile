@@ -354,12 +354,12 @@ scripts/Kbuild.include: ;
 include scripts/Kbuild.include
 
 # Make variables (CC, etc...)
-LDGOLD		= $(CROSS_COMPILE)ld.gold
 CPP		= $(CC) -E
 ifneq ($(LLVM),)
 CC		= clang
 LD		= ld.lld
 AR		= llvm-ar
+AS		= llvm-as
 NM		= llvm-nm
 OBJCOPY	= llvm-objcopy
 OBJDUMP	= llvm-objdump
@@ -367,14 +367,16 @@ READELF	= llvm-readelf
 OBJSIZE	= llvm-size
 STRIP		= llvm-strip
 else
-AS		= $(CROSS_COMPILE)as
-LD		= $(CROSS_COMPILE)ld
 CC		= $(CROSS_COMPILE)gcc
+LD		= $(CROSS_COMPILE)ld
 AR		?= $(CROSS_COMPILE)ar
+AS		= $(CROSS_COMPILE)as
 NM		?= $(CROSS_COMPILE)nm
-STRIP		= $(CROSS_COMPILE)strip
 OBJCOPY		= $(CROSS_COMPILE)objcopy
 OBJDUMP		= $(CROSS_COMPILE)objdump
+READELF		= $(CROSS_COMPILE)readelf
+OBJSIZE		= $(CROSS_COMPILE)size
+STRIP		= $(CROSS_COMPILE)strip
 endif
 AWK		= awk
 GENKSYMS	= scripts/genksyms/genksyms
