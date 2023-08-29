@@ -3,7 +3,7 @@ name: Build Redmi 5 Lineaged kernel
 on:
   push:
     branches:
-      - 'release/minimalist'
+      - 'release/fixup'
 
 jobs:
   build:
