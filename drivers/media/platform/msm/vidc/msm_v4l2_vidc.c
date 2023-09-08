@@ -792,9 +792,9 @@ static int __init msm_vidc_init(void)
 	INIT_LIST_HEAD(&vidc_driver->cores);
 	mutex_init(&vidc_driver->lock);
 	vidc_driver->debugfs_root = msm_vidc_debugfs_init_drv();
-	if (!vidc_driver->debugfs_root)
+	/* if (!vidc_driver->debugfs_root)
 		dprintk(VIDC_ERR,
-			"Failed to create debugfs for msm_vidc\n");
+			"Failed to create debugfs for msm_vidc\n"); */
 
 	rc = platform_driver_register(&msm_vidc_driver);
 	if (rc) {
