@@ -3,7 +3,7 @@ name: Build Redmi 5 Lineaged kernel
 on:
   push:
     branches:
-      - 'release/fixup'
+      - 'release/base'
 
 jobs:
   build:
@@ -39,5 +39,5 @@ jobs:
           to: ${{ secrets.CHANNEL_ID }}
           token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           format: html
-          message: <strong>Kernel Lineaged</strong> telah dibuat pada repo ${{ github.repository }} dengan <strong>Compiler Neutron Clang</strong> pada commits berikut <code>${{ github.sha }}</code>, untuk informasi lebih bisa membuka github repository <a href="https://www.github.com/naups/xiaomi_rosy_kernel/commits/${{ github.sha }}">naups</a>.
+          message: <strong>Kernel Lineaged test</strong> telah dibuat pada repo ${{ github.repository }} dengan <strong>Compiler Neutron Clang</strong> pada commits berikut <code>${{ github.sha }}</code>, untuk informasi lebih bisa membuka github repository <a href="https://www.github.com/naups/xiaomi_rosy_kernel/commits/${{ github.sha }}">naups</a>.
           document: ${{ steps.build.outputs.outfile }}
