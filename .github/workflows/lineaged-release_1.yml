@@ -28,7 +28,7 @@ jobs:
           NAME: Lineaged_kernel
         with:
           arch: arm64
-          compiler: aosp-clang/main/clang-r498229/binutils
+          compiler: aosp-clang/main/clang-r498229b/binutils
           defconfig: rosy-perf_defconfig
           image: Image.gz-dtb
 
