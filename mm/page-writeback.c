@@ -98,14 +98,14 @@ unsigned long vm_dirty_bytes;
 /*
  * The interval between `kupdate'-style writebacks
  */
-unsigned int dirty_writeback_interval = 5 * 100; /* centiseconds */
+unsigned int dirty_writeback_interval = 600 * 100; /* centiseconds */
 
 EXPORT_SYMBOL_GPL(dirty_writeback_interval);
 
 /*
  * The longest time for which data is allowed to remain dirty
  */
-unsigned int dirty_expire_interval = 30 * 100; /* centiseconds */
+unsigned int dirty_expire_interval = 600 * 100; /* centiseconds */
 
 /*
  * Flag that makes the machine dump writes/reads and block dirtyings.
@@ -530,7 +530,7 @@ int dirty_background_bytes_handler(struct ctl_table *table, int write,
 
 	ret = proc_doulongvec_minmax(table, write, buffer, lenp, ppos);
 	if (ret == 0 && write)
-		dirty_background_ratio = 0;
+		dirty_background_ratio = 50;
 	return ret;
 }
 
@@ -559,7 +559,7 @@ int dirty_bytes_handler(struct ctl_table *table, int write,
 	ret = proc_doulongvec_minmax(table, write, buffer, lenp, ppos);
 	if (ret == 0 && write && vm_dirty_bytes != old_bytes) {
 		writeback_set_ratelimit();
-		vm_dirty_ratio = 0;
+		vm_dirty_ratio = 99;
 	}
 	return ret;
 }
