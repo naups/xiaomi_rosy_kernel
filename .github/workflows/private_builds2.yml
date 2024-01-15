@@ -37,7 +37,7 @@ jobs:
         uses: appleboy/telegram-action@master
         with:
           to: ${{ secrets.PRIVATE_ID }}
-          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          token: ${{ secrets.TELEGRAM_SECRET }}
           format: html
           message: <strong>Kernel Lineaged - PRIVATE Extended</strong> telah dibuat pada repo ${{ github.repository }} dengan <strong>Compiler Neutron Clang</strong> pada commits berikut <code>${{ github.sha }}</code>, untuk informasi lebih bisa membuka github repository <a href="https://www.github.com/naups/xiaomi_rosy_kernel/commits/${{ github.sha }}">naups</a>.
           document: ${{ steps.build.outputs.outfile }}
