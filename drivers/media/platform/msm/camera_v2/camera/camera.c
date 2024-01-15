@@ -105,10 +105,6 @@ static int camera_v4l2_querycap(struct file *filep, void *fh,
 
 	rc = camera_check_event_status(&event);
 
-	cap->device_caps = V4L2_CAP_STREAMING |
-			V4L2_CAP_VIDEO_OUTPUT | V4L2_CAP_VIDEO_CAPTURE;
-	cap->capabilities = cap->device_caps | V4L2_CAP_DEVICE_CAPS;
-
 	return rc;
 }
 
@@ -935,7 +931,7 @@ int camera_init_v4l2(struct device *dev, unsigned int *session)
 	rc = media_entity_pads_init(&pvdev->vdev->entity, 0, NULL);
 	if (WARN_ON(rc < 0))
 		goto entity_fail;
-	pvdev->vdev->entity.group_id = QCAMERA_VNODE_GROUP_ID;
+	pvdev->vdev->entity.function = QCAMERA_VNODE_GROUP_ID;
 #endif
 
 	v4l2_dev->notify = NULL;

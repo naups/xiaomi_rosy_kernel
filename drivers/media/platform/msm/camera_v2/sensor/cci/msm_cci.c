@@ -1,5 +1,4 @@
 /* Copyright (c) 2012-2017, 2018, The Linux Foundation. All rights reserved.
- * Copyright (C) 2019 XiaoMi, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -1431,15 +1430,10 @@ static int32_t msm_cci_init(struct v4l2_subdev *sd,
 	}
 
 	/* Re-initialize the completion */
-	reinit_completion(&cci_dev->cci_master_info[MASTER_0].reset_complete);
+	reinit_completion(&cci_dev->cci_master_info[master].reset_complete);
 	for (i = 0; i < NUM_QUEUES; i++)
-		reinit_completion(&cci_dev->cci_master_info[MASTER_0].
+		reinit_completion(&cci_dev->cci_master_info[master].
 			report_q[i]);
-    reinit_completion(&cci_dev->cci_master_info[MASTER_1].reset_complete);
-	for (i = 0; i < NUM_QUEUES; i++)
-		reinit_completion(&cci_dev->cci_master_info[MASTER_1].
-			report_q[i]);
-
 	rc = msm_camera_enable_irq(cci_dev->irq, true);
 	if (rc < 0)
 		pr_err("%s: irq enable failed\n", __func__);
@@ -2161,7 +2155,7 @@ static int msm_cci_probe(struct platform_device *pdev)
 	new_cci_dev->msm_sd.sd.internal_ops = &msm_cci_internal_ops;
 	new_cci_dev->msm_sd.sd.flags |= V4L2_SUBDEV_FL_HAS_DEVNODE;
 	media_entity_pads_init(&new_cci_dev->msm_sd.sd.entity, 0, NULL);
-	new_cci_dev->msm_sd.sd.entity.group_id = MSM_CAMERA_SUBDEV_CCI;
+	new_cci_dev->msm_sd.sd.entity.function = MSM_CAMERA_SUBDEV_CCI;
 	new_cci_dev->msm_sd.sd.entity.name = new_cci_dev->msm_sd.sd.name;
 	new_cci_dev->msm_sd.close_seq = MSM_SD_CLOSE_2ND_CATEGORY | 0x6;
 	msm_sd_register(&new_cci_dev->msm_sd);
