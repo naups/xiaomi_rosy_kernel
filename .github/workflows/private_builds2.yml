@@ -1,9 +1,9 @@
-name: Build Redmi 5 Lineaged kernel
+name: Build Redmi 5 PRIVATE Extended Kernel
 
 on:
   push:
     branches:
-      - 'release/base'
+      - 'private'
 
 jobs:
   build:
@@ -25,10 +25,10 @@ jobs:
         uses: SantriKode/arm64-kernel-actions@master
         id: build
         env:
-          NAME: Lineaged_kernel
+          NAME: PRIVATE_Ex_kernel
         with:
           arch: arm64
-          compiler: aosp-clang/main/clang-r510928/binutils
+          compiler: neutron-clang/binutils
           defconfig: rosy-perf_defconfig
           image: Image.gz-dtb
 
@@ -36,8 +36,8 @@ jobs:
         if: ${{ success() }}
         uses: appleboy/telegram-action@master
         with:
-          to: ${{ secrets.CHANNEL_ID }}
+          to: ${{ secrets.PRIVATE_ID }}
           token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           format: html
-          message: <strong>Kernel Lineaged - BASE</strong> telah dibuat pada repo ${{ github.repository }} dengan <strong>Compiler AOSP Google</strong> pada commits berikut <code>${{ github.sha }}</code>, untuk informasi lebih bisa membuka github repository <a href="https://www.github.com/naups/xiaomi_rosy_kernel/commits/${{ github.sha }}">naups</a>.
+          message: <strong>Kernel Lineaged - PRIVATE Extended</strong> telah dibuat pada repo ${{ github.repository }} dengan <strong>Compiler Neutron Clang</strong> pada commits berikut <code>${{ github.sha }}</code>, untuk informasi lebih bisa membuka github repository <a href="https://www.github.com/naups/xiaomi_rosy_kernel/commits/${{ github.sha }}">naups</a>.
           document: ${{ steps.build.outputs.outfile }}
