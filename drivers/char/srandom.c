@@ -16,7 +16,7 @@
 
 #define DRIVER_AUTHOR "Jonathan Senkerik <josenk@jintegrate.co>"
 #define DRIVER_DESC   "Improved random number generator."
-#define ULTRA_HIGH_SPEED_MODE 1     /* Set to 0 for Chacha8 mode, set to 1 to enable Ultra High Speed Mode (XorShift) */
+#define ULTRA_HIGH_SPEED_MODE 0     /* Set to 0 for Chacha8 mode, set to 1 to enable Ultra High Speed Mode (XorShift) */
 #define SDEVICE_NAME "srandom"      /* Dev name as it appears in /proc/devices */
 #define APP_VERSION "2.0.0"
 #define numberOfRndArrays  64       /* Number of 512b Array. do not change */
@@ -25,13 +25,13 @@
 #define PAID 0
 
 
-//#define DEBUG_CONNECTIONS 0
-//#define DEBUG_READ 0
-//#define DEBUG_WRITE 0
-//#define DEBUG_UPDATE_ARRAYS 0
-//#define DEBUG_SHUFFLE 0
-//#define DEBUG_THREAD 0
-//#define DEBUG_CHACHA 0
+#define DEBUG_CONNECTIONS 1
+#define DEBUG_READ 1
+#define DEBUG_WRITE 1
+#define DEBUG_UPDATE_ARRAYS 1
+#define DEBUG_SHUFFLE 1
+#define DEBUG_THREAD 1
+#define DEBUG_CHACHA 1
 
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4,12,0)
     #define COPY_TO_USER raw_copy_to_user
