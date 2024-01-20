@@ -706,3 +706,11 @@ config VSERVICES_VTTY_COUNT
 	help
 	  The maximum number of Virtual Services serial devices to support.
 	  This limit applies to both the client and server.
+
+config SRANDOM
+	bool "Enable alternatives to devices urandom"
+	default n
+	help
+	  This option enables the srandom randomizer device driver,
+	  which provides an alternative way to access random data from
+	  the kernel's random number generator.
