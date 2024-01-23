@@ -7,6 +7,8 @@ on:
 
 jobs:
   build:
+    env:
+      commitmsg: ${{ github.event.head_commit.message }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -20,6 +22,10 @@ jobs:
           repository: SantriKode/AnyKranul3
           path: zipper
 
+      - name: Set start time
+        id: start-time
+        run: echo "START_TIME=$(date -u +'%s')" >> $GITHUB_ENV
+
       - name: Android kernel build
         if: ${{ success() }}
         uses: SantriKode/arm64-kernel-actions@master
@@ -32,6 +38,13 @@ jobs:
           defconfig: rosy-perf_defconfig
           image: Image.gz-dtb
 
+      - name: Save compile time
+        id: save-compile-time
+        run: |
+          echo "END_TIME=$(date -u +'%s')" >> $GITHUB_ENV
+          echo "TIME=$((${{ env.END_TIME }} - ${{ env.START_TIME }}))" >> $GITHUB_ENV
+          echo "FORMATTED_TIME=$(date -u -d @${{ env.TIME }} +'%M menit dan %S detik')" >> $GITHUB_ENV
+
       - name: Release build (Telegram)
         if: ${{ success() }}
         uses: appleboy/telegram-action@master
@@ -39,5 +52,11 @@ jobs:
           to: ${{ secrets.PRIVATE_ID }}
           token: ${{ secrets.TELEGRAM_SECRET }}
           format: html
-          message: <strong>Kernel Lineaged - PRIVATE Extended</strong> telah dibuat pada repo ${{ github.repository }} dengan <strong>Compiler AOSP Google</strong> pada commits berikut <code>${{ github.sha }}</code>, untuk informasi lebih bisa membuka github repository <a href="https://www.github.com/naups/xiaomi_rosy_kernel/commits/${{ github.sha }}">naups</a>.
           document: ${{ steps.build.outputs.outfile }}
+          message: >
+            <strong>Kernel Lineaged - PRIVATE Extended</strong> telah dibuat pada repo ${{ github.repository }} dengan <strong>Compiler AOSP Google</strong>\n
+            Nama Commits : ${{ env.commitmsg }}\n
+            Waktu Kompilasi: ${{ env.FORMATTED_TIME }}\n
+            Hash Commits : <code>${{ github.sha }}</code>\n
+            Untuk informasi lebih bisa membuka github repository <a href="https://www.github.com/naups/xiaomi_rosy_kernel/commits/${{ github.sha }}">naups</a>.
+
