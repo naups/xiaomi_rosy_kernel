@@ -13,6 +13,13 @@ jobs:
     permissions:
       contents: write
     steps:
+
+      - name: Set start time
+        id: start-time
+        run: |
+          echo "START=$(date +'%s')" >> $GITHUB_ENV
+          echo "DATE=$(date +'%F')" >> $GITHUB_ENV
+
       - name: Checkout kernel source
         uses: actions/checkout@v2
 
@@ -34,6 +41,14 @@ jobs:
           defconfig: rosy-perf_defconfig
           image: Image.gz-dtb
 
+      - name: Save compile time
+        id: save-compile-time
+        run: |
+          echo "END=$(date +'%s')" >> $GITHUB_ENV
+          echo "BEDA=$(expr ${{ env.END }} - ${{ env.START }} )" >> $GITHUB_ENV
+          echo "MENIT=$(expr ${{ env.BEDA }} / 60 )" >> $GITHUB_ENV
+          echo "DETIK=$(expr ${{ env.BEDA }} % 60 )" >> $GITHUB_ENV
+
       - name: Release build (Telegram)
         if: ${{ success() }}
         uses: appleboy/telegram-action@master
@@ -42,5 +57,5 @@ jobs:
           token: ${{ secrets.TELEGRAM_SECRET }}
           format: html
           document: ${{ steps.build.outputs.outfile }}
-          message: <blockquote><strong>Kernel Lineaged - PRIVATE Extended</strong> telah dibuat pada repo ${{ github.repository }} dengan <strong>Compiler AOSP Google</strong>\nNama Commits :; ${{ env.commitmsg }}\nWaktu Kompilasi:; ${{ steps.build.duration }}\nHash Commits :; <code>${{ github.sha }}</code>\nUntuk informasi lebih bisa membuka github repository <a href="https://www.github.com/naups/xiaomi_rosy_kernel/commits/${{ github.sha }}">naups</a>.</blockquote>
+          message: <blockquote><strong>Kernel Lineaged - PRIVATE Extended</strong> telah dibuat pada repo ${{ github.repository }} dengan <strong>Compiler AOSP Google</strong>\nNama Commits : ${{ env.commitmsg }}\nWaktu Kompilasi : ${{ env.MENIT }} menit dan {{ env.DETIK }} detik\nTanggal Kompilasi : ${{ env.DATE }}\nHash Commits : <code>${{ github.sha }}</code>\nUntuk informasi lebih bisa membuka github repository <a href="https://www.github.com/naups/xiaomi_rosy_kernel/commits/${{ github.sha }}">naups</a>.</blockquote>
 
