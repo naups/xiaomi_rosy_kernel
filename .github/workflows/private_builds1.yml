@@ -1,4 +1,4 @@
-name: Build Redmi 5 PRIVATE Extended Kernel
+name: Build Redmi 5 PRIVATE Extended Kernel GOOGLE CLANG
 
 on:
   push:
