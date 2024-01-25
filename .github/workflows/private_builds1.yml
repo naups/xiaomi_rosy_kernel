@@ -57,6 +57,13 @@ jobs:
         with:
           to: ${{ secrets.PRIVATE_ID }}
           token: ${{ secrets.TELEGRAM_SECRET }}
-          format: html
+          format: markdown
           document: ${{ steps.build.outputs.outfile }}
-          message: <strong>Kernel Lineaged - PRIVATE Extended</strong> telah dibuat pada repo ${{ github.repository }} dengan <strong>Compiler AOSP Google</strong> %0A Nama Commits :; ${{ env.commitmsg }} %0A Waktu Kompilasi :; ${{ env.MENIT }} menit dan {{ env.DETIK }} detik %0A Tanggal Kompilasi :; ${{ env.DATE }} %0A Hash Commits :; <code>${{ github.sha }}</code> %0A Untuk informasi lebih bisa membuka github repository <a href="https://www.github.com/naups/xiaomi_rosy_kernel/commits/${{ github.sha }}">naups</a>.
+          message: |-
+            *Kernel Lineaged - PRIVATE Extended* telah dibuat pada repo ${{ github.repository }} dengan *Compiler AOSP Google*
+            Nama Commits      . ${{ env.commitmsg }}
+            Waktu Kompilasi   . ${{ env.MENIT }} menit dan ${{ env.DETIK }} detik
+            Tanggal Kompilasi . ${{ env.DATE }}
+            Hash Commits      . `${{ github.sha }}`
+            Untuk informasi lebih lanjut, Anda dapat membuka repository GitHub [naups](https://www.github.com/naups/xiaomi_rosy_kernel/commits/${{ github.sha }})
+
