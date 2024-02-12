@@ -1,0 +1,69 @@
+name: Build Redmi 5 PRIVATE Extended Kernel GOOGLE CLANG
+
+on:
+  push:
+    branches:
+      - 'rebase/private'
+
+jobs:
+  build:
+    env:
+      commitmsg: ${{ github.event.head_commit.message }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+
+      - name: Set start time
+        id: start-time
+        run: |
+          echo "START=$(date +'%s')" >> $GITHUB_ENV
+          echo "DATE=$(date +'%F')" >> $GITHUB_ENV
+
+      - name: Checkout kernel source
+        uses: actions/checkout@v2
+
+      - name: Checkout zipper
+        uses: actions/checkout@v2
+        with:
+          repository: SantriKode/AnyKranul3
+          path: zipper
+
+      - name: Android kernel build
+        if: ${{ success() }}
+        uses: SantriKode/arm64-kernel-actions@master
+        id: build
+        env:
+          NAME: PRIVATE_Ex_kernel
+        with:
+          arch: arm64
+          compiler: aosp-clang/main/clang-r510928/binutils
+          defconfig: rosy-perf_defconfig
+          image: Image.gz-dtb
+
+      - name: Save compile time
+        id: save-compile-time
+        run: |
+          END=$(date +'%s')
+          BEDA=$((END - START))
+          MENIT=$((BEDA / 60))
+          DETIK=$((BEDA % 60))
+          echo "MENIT=$MENIT" >> $GITHUB_ENV
+          echo "DETIK=$DETIK" >> $GITHUB_ENV
+
+      - name: Release build (Telegram)
+        if: ${{ success() }}
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.PRIVATE_ID }}
+          token: ${{ secrets.TELEGRAM_SECRET }}
+          format: markdown
+          document: ${{ steps.build.outputs.outfile }}
+          message: |-
+            *Kernel Lineaged - PRIVATE Extended* telah dibuat pada repo ${{ github.repository }} dengan *Compiler AOSP Google*
+            Nama Commits      . ${{ env.commitmsg }}
+            Waktu Kompilasi   . ${{ env.MENIT }} menit dan ${{ env.DETIK }} detik
+            Tanggal Kompilasi . ${{ env.DATE }}
+            Hash Commits      . `${{ github.sha }}`
+            Untuk informasi lebih lanjut, Anda dapat membuka repository GitHub [naups](https://www.github.com/naups/xiaomi_rosy_kernel/commits/${{ github.sha }})
+
