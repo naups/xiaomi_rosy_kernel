@@ -11,6 +11,13 @@ jobs:
     permissions:
       contents: write
     steps:
+
+      - name: Set start time
+        id: start-time
+        run: |
+          echo "START=$(date +'%s')" >> $GITHUB_ENV
+          echo "DATE=$(date +'%F')" >> $GITHUB_ENV
+
       - name: Checkout kernel source
         uses: actions/checkout@v2
 
@@ -32,12 +39,28 @@ jobs:
           defconfig: rosy-perf_defconfig
           image: Image.gz-dtb
 
+      - name: Save compile time
+        id: save-compile-time
+        run: |
+          END=$(date +'%s')
+          BEDA=$((END - START))
+          MENIT=$((BEDA / 60))
+          DETIK=$((BEDA % 60))
+          echo "MENIT=$MENIT" >> $GITHUB_ENV
+          echo "DETIK=$DETIK" >> $GITHUB_ENV
+
       - name: Release build (Telegram)
         if: ${{ success() }}
         uses: appleboy/telegram-action@master
         with:
-          to: ${{ secrets.CHANNEL_ID }}
-          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          to: ${{ secrets.PRIVATE_ID }}
+          token: ${{ secrets.TELEGRAM_SECRET }}
           format: html
-          message: <strong>Kernel Lineaged - BASE 2</strong> telah dibuat pada repo ${{ github.repository }} dengan <strong>Compiler AOSP Google</strong> pada commits berikut <code>${{ github.sha }}</code>, untuk informasi lebih bisa membuka github repository <a href="https://www.github.com/naups/xiaomi_rosy_kernel/commits/${{ github.sha }}">naups</a>.
           document: ${{ steps.build.outputs.outfile }}
+          message: >
+            <strong>Kernel Lineaged - Release Base 2</strong> telah dibuat pada repo ${{ github.repository }} dengan <strong>Compiler AOSP Google</strong>
+            Waktu Kompilasi':' ${{ env.MENIT }} menit dan ${{ env.DETIK }} detik
+            Tanggal Kompilasi ':' ${{ env.DATE }}
+            Versi Lineage ':' <b>Lineage 21 Only</b>
+            Hash Commits ':' <code>${{ github.sha }}</code>
+            Untuk informasi lebih bisa membuka github repository <a href="https://www.github.com/naups/xiaomi_rosy_kernel/commits/${{ github.sha }}">naups</a>.
