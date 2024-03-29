@@ -59,8 +59,8 @@ jobs:
           document: ${{ steps.build.outputs.outfile }}
           message: >
             <strong>Kernel Lineaged - Release Base 2</strong> telah dibuat pada repo ${{ github.repository }} dengan <strong>Compiler Neutron Clang</strong>
-            Waktu Kompilasi':' ${{ env.MENIT }} menit dan ${{ env.DETIK }} detik
-            Tanggal Kompilasi ':' ${{ env.DATE }}
-            Versi Lineage ':' <b>Lineage 21 Only</b>
-            Hash Commits ':' <code>${{ github.sha }}</code>
+            Waktu Kompilasi . ${{ env.MENIT }} menit dan ${{ env.DETIK }} detik
+            Tanggal Kompilasi . ${{ env.DATE }}
+            Versi Lineage . <b>Lineage 21 Only</b>
+            Hash Commits . <code>${{ github.sha }}</code>
             Untuk informasi lebih bisa membuka github repository <a href="https://www.github.com/naups/xiaomi_rosy_kernel/commits/${{ github.sha }}">naups</a>.
