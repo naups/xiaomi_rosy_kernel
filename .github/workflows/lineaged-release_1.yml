@@ -22,7 +22,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Checkout stable ksu
-        id: curl latest ksu
+        id: curl-latest-ksu
         run: |
           cd /home/runner/work/xiaomi_rosy_kernel/xiaomi_rosy_kernel
           rm -rf KernelSU
