@@ -1,9 +1,9 @@
-name: Build Redmi 5 Lineaged kernel (Base2 AOSP)
+name: Build Redmi 5 Lineaged kernel (Lineaged Base 2 KSU - AOSP)
 
 on:
   push:
     branches:
-      - 'release/base2'
+      - 'lineagedksu'
 
 jobs:
   build:
@@ -21,6 +21,13 @@ jobs:
       - name: Checkout kernel source
         uses: actions/checkout@v2
 
+      - name: Checkout stable ksu
+        id: curl latest ksu
+        run: |
+          cd /home/runner/work/xiaomi_rosy_kernel/xiaomi_rosy_kernel
+          rm -rf KernelSU
+          curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -
+
       - name: Checkout zipper
         uses: actions/checkout@v2
         with:
@@ -32,7 +39,7 @@ jobs:
         uses: SantriKode/arm64-kernel-actions@master
         id: build
         env:
-          NAME: Lineaged_kernel
+          NAME: Lineaged_KernelSU_LOS21_AOSP
         with:
           arch: arm64
           compiler: aosp-clang/main/clang-r522817/binutils
@@ -58,9 +65,10 @@ jobs:
           format: html
           document: ${{ steps.build.outputs.outfile }}
           message: >
-            <strong>Kernel Lineaged - Release Base 2</strong> telah dibuat pada repo ${{ github.repository }} dengan <strong>Compiler AOSP Google</strong>
-            Waktu Kompilasi . ${{ env.MENIT }} menit dan ${{ env.DETIK }} detik
-            Tanggal Kompilasi . ${{ env.DATE }}
-            Versi Lineage . <b>Lineage 21 Only</b>
-            Hash Commits . <code>${{ github.sha }}</code>
+            <strong>Kernel Lineaged - Base 2 KernelSU</strong> telah dibuat pada repo ${{ github.repository }} dengan <strong>Compiler AOSP Google</strong>
+            Waktu Kompilasi   :. ${{ env.MENIT }} menit dan ${{ env.DETIK }} detik
+            Tanggal Kompilasi :. ${{ env.DATE }}
+            Jenis Kernel      :. KernelSU v0.9.2
+            Versi Lineage     :. <b>Lineage 21 Only</b>
+            Hash Commits      :. <code>${{ github.sha }}</code>
             Untuk informasi lebih bisa membuka github repository <a href="https://www.github.com/naups/xiaomi_rosy_kernel/commits/${{ github.sha }}">naups</a>.
