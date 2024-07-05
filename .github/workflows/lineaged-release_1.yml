@@ -1,4 +1,4 @@
-name: Build Redmi 5 Lineaged kernel (Lineaged Base 2 KSU - AOSP)
+name: Redmi 5 Lineaged kernel - Base 2 KSU - AOSP
 
 on:
   push:
