@@ -1,9 +1,9 @@
-name: Build Redmi 5 PRIVATE Extended Kernel GOOGLE CLANG
+name: Redmi 5 Extended Kernel - KSU - AOSP
 
 on:
   push:
     branches:
-      - 'rebase/private'
+      - 'rebase/private2'
 
 jobs:
   build:
@@ -21,10 +21,17 @@ jobs:
           echo "DATE=$(date +'%F')" >> $GITHUB_ENV
 
       - name: Checkout kernel source
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
+
+      - name: Checkout stable ksu
+        id: curl-latest-ksu
+        run: |
+          cd /home/runner/work/xiaomi_rosy_kernel/xiaomi_rosy_kernel
+          rm -rf KernelSU
+          curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -
 
       - name: Checkout zipper
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           repository: SantriKode/AnyKranul3
           path: zipper
@@ -65,5 +72,7 @@ jobs:
             Waktu Kompilasi   :/ ${{ env.MENIT }} menit dan ${{ env.DETIK }} detik
             Tanggal Kompilasi :/ ${{ env.DATE }}
             Hash Commits      :/ ```${{ github.sha }}```
+            Jenis Kernel      :/ KernelSU Added
+            Versi Lineage     :/ *Lineage 20 Only*
             Untuk informasi lebih lanjut, Anda dapat membuka repository GitHub [naups](https://www.github.com/naups/xiaomi_rosy_kernel/commits/${{ github.sha }})
 
