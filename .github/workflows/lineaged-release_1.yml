@@ -26,7 +26,8 @@ jobs:
         run: |
           cd /home/runner/work/xiaomi_rosy_kernel/xiaomi_rosy_kernel
           rm -rf KernelSU
-          curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -
+          curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -s v0.9.5
+
 
       - name: Checkout zipper
         uses: actions/checkout@v2
