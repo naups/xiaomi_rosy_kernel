@@ -26,7 +26,8 @@ jobs:
       - name: Checkout zipper
         uses: actions/checkout@v2
         with:
-          repository: SantriKode/AnyKranul3
+          repository: naups/AnyKernel3
+          ref: rosy
           path: zipper
 
       - name: Android kernel build
@@ -37,7 +38,7 @@ jobs:
           NAME: PRIVATE_Ex_kernel
         with:
           arch: arm64
-          compiler: aosp-clang/main/clang-r530567/binutils
+          compiler: aosp-clang/main/clang-r536225/binutils
           defconfig: rosy-perf_defconfig
           image: Image.gz-dtb
 
